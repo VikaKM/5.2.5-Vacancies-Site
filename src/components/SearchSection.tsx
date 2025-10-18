@@ -2,9 +2,22 @@ import {  Container, Grid, Stack, Group, Title, Text } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
 import ButtonForm from './UI/Button';
 import InputSearch from './UI/Input';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
+import { setSearchText } from '../redux/filtersSlice';
+import type { AppDispatch, RootState } from '../redux/store';
 
 export default function SearchSection() {
+  
+  const dispatch = useDispatch<AppDispatch>();
+  const currentSearch = useSelector((state: RootState) => state.filters.searchText);
+
+  const [localSearch, setLocalSearch] = useState(currentSearch || '');
+
+  const handleSearch = () => {
+    dispatch(setSearchText(localSearch.trim()));
+  };
+
 
   return (
     <Container size='lg' pt='xl' pb={20}>
@@ -27,6 +40,8 @@ export default function SearchSection() {
             <InputSearch 
               placeholder='Должность или название вакансии'
               leftSection={<IconSearch size={16}/>}
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
               style={{ width: 403, flex: 1}}
               styles={{
                 input: {backgroundColor: '#f8f9fa'}
@@ -35,6 +50,7 @@ export default function SearchSection() {
             </InputSearch>
 
             <ButtonForm 
+              onClick={handleSearch}
               style={{ 
                 fontFamily: 'OpenSansMedium', 
                 color: '#fff', 

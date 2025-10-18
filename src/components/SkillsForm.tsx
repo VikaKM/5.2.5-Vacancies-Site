@@ -1,98 +1,101 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState, AppDispatch } from '../redux/store';
+import { setSkills as setSkillsAction } from '../redux/filtersSlice';
 import { Stack, Text, Group, Badge, CloseButton } from '@mantine/core';
 import ButtonForm from './UI/Button';
-import InputForm from './UI/Input';  
+import InputForm from './UI/Input';
 
 export default function SkillsForm() {
-  const [skills, setSkills] = useState<string[]>(['TypeScript', 'React', 'Redux']);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const reduxSkills = useSelector((state: RootState) => state.filters.skills);
+
+  const [skills, setSkills] = useState<string[]>(reduxSkills);
   const [inputValue, setInputValue] = useState('');
 
+  // Синхронизация локального стейта с Redux
+  useEffect(() => {
+    setSkills(reduxSkills);
+  }, [reduxSkills]);
+
+  // Добавление навыка
   const addSkill = () => {
     const trimmed = inputValue.trim();
-    if (trimmed && !skills.includes(trimmed)) {
-      setSkills([...skills, trimmed]);
-      setInputValue('');
-    }
+    if (!trimmed || skills.includes(trimmed)) return;
+
+    const newSkills = [...skills, trimmed];
+    setSkills(newSkills);
+    dispatch(setSkillsAction(newSkills));
+    setInputValue('');
   };
 
+  // Удаление навыка
   const removeSkill = (skill: string) => {
-    setSkills(skills.filter((s) => s !== skill));
+    const newSkills = skills.filter(s => s !== skill);
+    setSkills(newSkills);
+    dispatch(setSkillsAction(newSkills));
   };
 
   return (
-    <Stack 
-      gap="sm" 
-      p={0} 
-      ml={7} 
-      mr={0} 
-      style={{ 
-        background: '#fff', 
-        borderRadius: 12, 
-        overflow: 'visible'
-      }}
+    <Stack
+      gap="sm"
+      p={0}
+      ml={7}
+      mr={0}
+      style={{ background: '#fff', borderRadius: 12, overflow: 'visible' }}
     >
-      <Text 
-        size='md' 
-        ta='left' 
-        mt={7} 
-        style={{
-          fontFamily: 'OpenSansSemiBold', 
-          fontSize: '14px'
-        }}
+      <Text
+        size="md"
+        ta="left"
+        mt={7}
+        style={{ fontFamily: 'OpenSansSemiBold', fontSize: '14px' }}
       >
         Ключевые навыки
       </Text>
 
-      {/* Ввод + кнопка */}
-      <Group gap="sm" wrap='nowrap' mb={10}>
+      <Group gap="sm" wrap="nowrap" mb={10}>
         <InputForm
-          placeholder='Навык'
+          placeholder="Навык"
           value={inputValue}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
-            setInputValue(e.currentTarget.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setInputValue(e.currentTarget.value)
+          }
           style={{ width: 227, height: 30 }}
         />
-        <ButtonForm 
+        <ButtonForm
           onClick={addSkill}
-          mt={5} 
-          p={0} 
+          mt={5}
+          p={0}
           style={{
             backgroundColor: '#8cb4ff',
             color: 'white',
             width: 28,
             height: 28,
-            fontSize: '25px'
+            fontSize: '25px',
           }}
         >
           +
         </ButtonForm>
       </Group>
 
-      {/* Вывод добавленных навыков */}
-      <Group gap='xs' wrap='wrap'>
-        {skills.map((skill) => (
+      <Group gap="xs" wrap="wrap">
+        {skills.map(skill => (
           <Badge
-            key={skill}
-            color='black'
-            variant='light'
-            rightSection={
-              <CloseButton 
-                size={16} 
-                onClick={() => removeSkill(skill)} />
-            }
-            styles={{ 
-              root: { 
-                width: 103, 
-                height: 24, 
-                textTransform: 'none', 
-                textAlign: 'center', 
-                justifyContent: 'center' 
-              }
+            key={`badge-${skill}`}
+            color="black"
+            variant="light"
+            rightSection={<CloseButton size={16} onClick={() => removeSkill(skill)} />}
+            styles={{
+              root: {
+                width: 103,
+                height: 24,
+                textTransform: 'none',
+                textAlign: 'center',
+                justifyContent: 'center',
+              },
             }}
-            style={{
-              fontFamily: 'OpenSansRegular', 
-              fontSize: '12px'
-            }}
+            style={{ fontFamily: 'OpenSansRegular', fontSize: '12px' }}
           >
             {skill}
           </Badge>

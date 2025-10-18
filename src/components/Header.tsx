@@ -1,6 +1,7 @@
 import { AppShell, Group, Text, Image, Anchor, ActionIcon, Center } from '@mantine/core';
 import { IconCircle, IconUser } from '@tabler/icons-react';
 import logo from '../assets/logo-hh.png';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
 
@@ -33,7 +34,7 @@ export default function Header() {
             {/* ссылка на вакансии */}
 
             <Group gap={6} align='center'>
-              <Anchor href='/page' underline='hover' c='black' style={{fontSize: '14px'}}>
+              <Anchor component={Link} to="/vacancies"  underline='hover' c='black' style={{fontSize: '14px'}}>
                 Вакансии FE
               </Anchor>
               <ActionIcon variant='filled' c='blue' radius='xl' size={10} style={{ padding: 0 }}>

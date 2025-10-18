@@ -1,8 +1,8 @@
 import { Container, Grid, Stack, Paper } from '@mantine/core';
-import SearchSection from './SearchSection';
-import CitySelect from './CitySelect';
-import SkillsForm from './SkillsForm';
-import VacancyList from './VacansyList';
+import SearchSection from '../SearchSection';
+import CitySelect from '../CitySelect';
+import SkillsForm from '../SkillsForm';
+import VacancyList from '../VacansyList';
 
 export default function MainPage() {
   return (
@@ -33,7 +33,7 @@ export default function MainPage() {
               p='sm'
               style={{ 
                 width: '320px',
-                height: '300px',
+                minHeight: '300px',
                 display: 'flex',
                 flexDirection: 'column', 
                 ustifyContent: 'space-between' 

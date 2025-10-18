@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 
-type Vacancy = {
+export type Vacancy = {
   id: string;
   name: string;
   area: { name: string };
@@ -9,6 +10,8 @@ type Vacancy = {
   salary?: { from?: number; to?: number; currency?: string } | null;
   experience: { name: string };
   schedule: { name: string };
+  key_skills: { name: string }[];
+  snippet?: { requirement?: string; responsibility?: string };
   alternate_url: string;
 };
 
@@ -20,6 +23,7 @@ type VacanciesResponse = {
 
 interface VacanciesState {
   vacancies: Vacancy[];
+  selectedVacancy: Vacancy | null;
   found: number;
   pages: number;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -28,52 +32,79 @@ interface VacanciesState {
 
 const initialState: VacanciesState = {
   vacancies: [],
+  selectedVacancy: null,
   found: 0,
   pages: 0,
   status: 'idle',
   error: null,
 };
 
-export const fetchVacancies = 
-  createAsyncThunk<VacanciesResponse, { page: number; city?: string }>(
+// --- Thunk для получения вакансий
+export const fetchVacancies = createAsyncThunk<
+  VacanciesResponse,
+  { page: number; city?: string; skills?: string[]; searchText?: string }
+>(
   'vacancies/fetch',
-  async ({ page, city }, { rejectWithValue }) => {
+  async ({ page, city, skills, searchText }, { rejectWithValue }) => {
     try {
-        const params: Record<string, string | number | undefined>= {
+      const params: Record<string, string | number | undefined> = {
         industry: 7,
         professional_role: 96,
         per_page: 10,
         page,
       };
 
-      if (city) {
+      // --- фильтр по городу
+      if (city && city !== 'Все города') {
         switch (city) {
           case 'Москва':
-            params.area = 1; break;
+            params.area = 1;
+            break;
           case 'Санкт-Петербург':
-            params.area = 2; break;
+            params.area = 2;
+            break;
         }
       }
 
-      const response = await axios.get<VacanciesResponse>('https://api.hh.ru/vacancies', {
-        params,
-      });
+      // --- объединяем skills и searchText в один параметр text
+      const textParts: string[] = [];
+
+      if (skills && skills.length > 0) {
+        textParts.push(skills.map(s => `keyskills:${s}`).join(' AND '));
+      }
+
+      if (searchText) {
+        textParts.push(searchText);
+      }
+
+      if (textParts.length > 0) {
+        params.text = textParts.join(' AND ');
+      }
+
+      const response = await axios.get<VacanciesResponse>(
+        'https://api.hh.ru/vacancies',
+        { params }
+      );
+console.log(response.data)
       return response.data;
     } catch (err) {
       const error = err as AxiosError<{ message?: string }>;
       return rejectWithValue(error.message || 'Ошибка при загрузке вакансий');
+    }
   }
- }
 );
-
 
 const vacanciesSlice = createSlice({
   name: 'vacancies',
   initialState,
-  reducers: {},
-  extraReducers: (builder) => {
+  reducers: {
+    setSelectedVacancy(state, action: PayloadAction<Vacancy>) {
+      state.selectedVacancy = action.payload;
+    },
+  },
+  extraReducers: builder => {
     builder
-      .addCase(fetchVacancies.pending, (state) => {
+      .addCase(fetchVacancies.pending, state => {
         state.status = 'loading';
         state.error = null;
       })
@@ -90,4 +121,5 @@ const vacanciesSlice = createSlice({
   },
 });
 
+export const { setSelectedVacancy } = vacanciesSlice.actions;
 export default vacanciesSlice.reducer;

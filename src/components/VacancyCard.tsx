@@ -1,27 +1,28 @@
 import { Card, Text, Group, Stack } from '@mantine/core';
+import { useNavigate } from "react-router-dom";
 import ButtonForm from './UI/Button';
 import WorkFormatBadge from './UI/WorkFormatBadge';
+import { setSelectedVacancy } from '../redux/vacanciesSlice';
+import { useDispatch } from 'react-redux';
+import type { Vacancy } from '../redux/vacanciesSlice';
 
 type VacancyCardProps = {
-  title: string;
-  salary?: { from?: number; to?: number; currency?: string };
-  experience?: string;
-  company?: string;
-  city?: string;
-  schedule?: { id?: string; name?: string };
+  vacancy: Vacancy;
 }
 
-export default function VacancyCard({
-  title,
-  salary,
-  experience, 
-  company,
-  city,
-  schedule,
-} : VacancyCardProps) {
-    const salaryText = salary
-    ? `${salary.from ?? ''}${salary.from && salary.to ? ' – ' : ''}${salary.to ?? ''} ${salary.currency ?? '₽'}`
+export default function VacancyCard({vacancy} : VacancyCardProps) {
+    const salaryText = vacancy.salary
+    ? `${vacancy.salary.from ?? ''}${vacancy.salary.from && vacancy.salary.to ? ' – ' : ''}${vacancy.salary.to ?? ''} ${vacancy.salary.currency ?? '₽'}`
     : 'Зарплата не указана';
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleClick = () => {
+    dispatch(setSelectedVacancy(vacancy));
+    navigate(`/vacancies/${vacancy.id}`);
+  };
+
 
   return (
     <Card 
@@ -45,7 +46,7 @@ export default function VacancyCard({
             textAlign: 'left'
           }}
         >
-          {title}
+          {vacancy.name}
         </Text>
         
         <Group 
@@ -60,31 +61,33 @@ export default function VacancyCard({
             {salaryText}
           </Text>
           <Text c='gray' size="sm">
-            {experience ?? 'не указан'}
+            {vacancy.experience.name ?? 'не указан'}
           </Text>
         </Group>
 
         <Text 
           mb={12} 
           c='gray' 
-          size='sm' 
           style={{
             fontFamily: 'OpenSansRegular', 
             fontSize: '14px'
           }}
         >
-          {company}
+          {vacancy.employer.name}
         </Text>
 
-        <WorkFormatBadge schedule={schedule}/>
+        <WorkFormatBadge schedule={vacancy.schedule}/>
 
-        <Text size='sm' style={{fontFamily: 'OpenSansRegular', fontSize: '14px'}}>
-          {city}
+        <Text style={{fontFamily: 'OpenSansRegular', fontSize: '14px'}}>
+          {vacancy.area.name}
         </Text>
 
 
         <Group justify="apart" mt="md">
-          <ButtonForm style={{backgroundColor: 'black', color: 'white'}}>
+          <ButtonForm 
+            onClick={handleClick}
+            style={{backgroundColor: 'black', color: 'white'}}
+          >
             Смотреть вакансию
           </ButtonForm>
 

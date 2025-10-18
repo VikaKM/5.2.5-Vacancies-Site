@@ -10,7 +10,7 @@ export default function CitySelect() {
 
   return (
     <Select
-      value={selectedCity}
+      value={selectedCity === 'Все города' ? '' : selectedCity}
       onChange={(value) => {
         dispatch(setCity(value && value !== '' ? value : 'Все города'))}}
       placeholder='Выберите город'
