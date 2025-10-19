@@ -13,7 +13,6 @@ export default function VacancyList() {
   const dispatch = useDispatch<AppDispatch>();
   const [currentPage, setCurrentPage] = useState(0);
 
-  // --- Состояние из Redux
   const vacancies = useSelector((state: RootState) => state.vacancies.vacancies);
   const status = useSelector((state: RootState) => state.vacancies.status);
   const error = useSelector((state: RootState) => state.vacancies.error);
@@ -25,7 +24,6 @@ export default function VacancyList() {
 
   const loading = status === 'loading';
 
-  // --- Чтение фильтров из URL при монтировании
   useEffect(() => {
     const city = searchParams.get('city') ?? 'Все города';
     const search = searchParams.get('search') ?? '';
@@ -36,7 +34,7 @@ export default function VacancyList() {
     dispatch(setSkills(skillsParam ? skillsParam.split(',') : []));
   }, [searchParams, dispatch]);
 
-  // --- Синхронизация URL при изменении фильтров
+
   useEffect(() => {
     const params: Record<string, string> = {};
     if (cityFilter && cityFilter !== 'Все города') params.city = cityFilter;
@@ -46,12 +44,10 @@ export default function VacancyList() {
     setSearchParams(params, { replace: true });
   }, [cityFilter, searchText, userSkills, setSearchParams]);
 
-  // --- Сброс страницы при изменении фильтров
   useEffect(() => {
     setCurrentPage(0);
   }, [cityFilter, searchText, userSkills]);
 
-  // --- Загрузка вакансий с сервера
   useEffect(() => {
     dispatch(
       fetchVacancies({

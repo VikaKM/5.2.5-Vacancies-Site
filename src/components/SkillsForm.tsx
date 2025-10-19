@@ -14,12 +14,10 @@ export default function SkillsForm() {
   const [skills, setSkills] = useState<string[]>(reduxSkills);
   const [inputValue, setInputValue] = useState('');
 
-  // Синхронизация локального стейта с Redux
   useEffect(() => {
     setSkills(reduxSkills);
   }, [reduxSkills]);
 
-  // Добавление навыка
   const addSkill = () => {
     const trimmed = inputValue.trim();
     if (!trimmed || skills.includes(trimmed)) return;
@@ -30,7 +28,6 @@ export default function SkillsForm() {
     setInputValue('');
   };
 
-  // Удаление навыка
   const removeSkill = (skill: string) => {
     const newSkills = skills.filter(s => s !== skill);
     setSkills(newSkills);

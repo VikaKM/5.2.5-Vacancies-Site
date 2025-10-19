@@ -39,7 +39,6 @@ const initialState: VacanciesState = {
   error: null,
 };
 
-// --- Thunk для получения вакансий
 export const fetchVacancies = createAsyncThunk<
   VacanciesResponse,
   { page: number; city?: string; skills?: string[]; searchText?: string }
@@ -54,7 +53,6 @@ export const fetchVacancies = createAsyncThunk<
         page,
       };
 
-      // --- фильтр по городу
       if (city && city !== 'Все города') {
         switch (city) {
           case 'Москва':
@@ -66,7 +64,6 @@ export const fetchVacancies = createAsyncThunk<
         }
       }
 
-      // --- объединяем skills и searchText в один параметр text
       const textParts: string[] = [];
 
       if (skills && skills.length > 0) {
