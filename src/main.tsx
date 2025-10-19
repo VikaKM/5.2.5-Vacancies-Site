@@ -10,7 +10,7 @@ import './index.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter basename="/4.2.3-Vacancies-Site">
+    <BrowserRouter basename="/5.2.5-Vacancies-Site">
       <Provider store={store}>
         <MantineProvider>
           <App />
